@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"net/http"
 	"os"
 	"os/user"
 	"path/filepath"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/pirmd/epub"
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
 type Book struct {
@@ -20,10 +22,14 @@ type Book struct {
 }
 
 type User struct {
-	name  string `yaml:"name"`
-	id    string `yaml:"id"`
-	pw    string `yaml:"pw"`
-	books []Book `yaml:"books"`
+	Name  string `yaml:"name"`
+	Id    string `yaml:"id"`
+	Pw    string `yaml:"pw"`
+	Books []Book `yaml:"books"`
+}
+
+type ConfigYaml struct {
+	EpubsPath string `yaml:"epubsPath"`
 }
 
 var epubsPath string = ""
@@ -32,14 +38,14 @@ var epubExt = ".epub"
 
 func main() {
 
-	viper.SetConfigType("yaml")
-	viper.SetConfigFile("./config.yaml")
-	err := viper.ReadInConfig()
+	bytes, err := os.ReadFile("./config.yaml")
 	if err != nil {
-		fmt.Println("Error reading config file:", err)
-		return
+		fmt.Println(err)
 	}
-	epubsPath = viper.GetString("epubsPath")
+	configyaml := ConfigYaml{}
+	yaml.Unmarshal(bytes, &configyaml)
+	epubsPath = configyaml.EpubsPath
+
 	epubsPath, err = ExpandTilde(epubsPath)
 	if err != nil {
 		fmt.Println(err)
@@ -51,29 +57,32 @@ func main() {
 	var exampleConfigName = "example.yaml"
 	var accFolder = "./acc"
 	var examplePath = filepath.Join(accFolder, exampleConfigName)
-	exampleConfig := viper.New()
-	exampleConfig.SetConfigType("yaml")
-	exampleConfig.SetConfigFile(examplePath)
+
 	_, err = os.Stat(accFolder)
-	if err != nil {
+	if os.IsNotExist(err) {
 		err = os.Mkdir(accFolder, os.ModePerm)
 		if err != nil {
 			fmt.Println("创建 acc 文件夹失败")
 		}
 	}
-	exampleConfig.ReadInConfig()
-	var exampleUser User
-	err = exampleConfig.Unmarshal(&exampleUser)
 	if err != nil {
 		fmt.Println("加载 example.yaml 失败", err)
 	}
-	if exampleUser.name == "" {
-		exampleUser.name = "example"
-		exampleUser.id = "0"
-		exampleUser.pw = ""
+
+	bytes, err = os.ReadFile(examplePath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	exampleUser := User{}
+	yaml.Unmarshal(bytes, &exampleUser)
+
+	if exampleUser.Name == "" {
+		exampleUser.Name = "example"
+		exampleUser.Id = "0"
+		exampleUser.Pw = ""
 	}
 
-	exampleUser.books = []Book{}
+	exampleUser.Books = []Book{}
 	filepath.Walk(epubsPath, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
@@ -85,15 +94,23 @@ func main() {
 			if book.Path != "" {
 				fmt.Println(book)
 			}
-			exampleUser.books = append(exampleUser.books, book)
+			exampleUser.Books = append(exampleUser.Books, book)
 		}
 		return nil
 	})
-	// exampleConfig.marsha
-	exampleConfig.WriteConfig()
-	for index, book := range exampleUser.books {
+
+	bytes, err = yaml.Marshal(&exampleUser)
+	os.WriteFile(examplePath, bytes, os.ModePerm)
+	for index, book := range exampleUser.Books {
 		fmt.Println(index, book)
 	}
+
+	router := gin.Default()
+	router.GET("/bookshelf", func(c *gin.Context) {
+		c.JSON(http.StatusOK, exampleUser.Books)
+	})
+
+	router.Run()
 
 	return
 }
@@ -141,27 +158,31 @@ func GenerateEpubWebInfo(path string) Book {
 				if item.ID == metaTag.Content {
 
 					for _, file := range e.File {
-						fmt.Println("文件名对比", file.Name, filepath.Base(file.Name), coverPath, filepath.Base(coverPath))
+						// fmt.Println("文件名对比", file.Name, filepath.Base(file.Name), coverPath, filepath.Base(coverPath))
 						if filepath.Base(file.Name) == filepath.Base(coverPath) {
 							fmt.Println(file.Name)
 							epubWithoutExt := strings.TrimSuffix(filepath.Base(path), filepath.Ext(filepath.Base(path)))
 							coverPathInSys := filepath.Join(epubsImagesPath, (epubWithoutExt + filepath.Ext(file.Name)))
-							fmt.Println("图片路径 ", epubWithoutExt, coverPathInSys)
-							destFile, err := os.Create(coverPathInSys)
-							if err != nil {
-								fmt.Println(err)
-								return book
+							// fmt.Println("图片路径 ", epubWithoutExt, coverPathInSys)
+							_, err = os.Stat(coverPathInSys)
+							if os.IsNotExist(err) {
+								destFile, err := os.Create(coverPathInSys)
+								if err != nil {
+									fmt.Println(err)
+									return book
+								}
+								reader, err := file.Open()
+								if err != nil {
+									fmt.Println(err)
+									return book
+								}
+								_, err = io.Copy(destFile, reader)
+								if err != nil {
+									fmt.Println("复制失败", err)
+									return book
+								}
 							}
-							reader, err := file.Open()
-							if err != nil {
-								fmt.Println(err)
-								return book
-							}
-							_, err = io.Copy(destFile, reader)
-							if err != nil {
-								fmt.Println("复制失败", err)
-								return book
-							}
+
 							book.CoverPath = coverPathInSys
 							goto end
 						}
