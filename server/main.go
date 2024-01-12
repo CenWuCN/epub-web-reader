@@ -35,6 +35,7 @@ type ConfigYaml struct {
 var epubsPath string = ""
 var epubsImagesPath string = ""
 var epubExt = ".epub"
+var ginEpubsStaticPath = "/epubs"
 
 func main() {
 
@@ -106,6 +107,7 @@ func main() {
 	}
 
 	router := gin.Default()
+	router.Static(ginEpubsStaticPath, epubsPath)
 	router.GET("/bookshelf", func(c *gin.Context) {
 		c.JSON(http.StatusOK, exampleUser.Books)
 	})
@@ -145,7 +147,8 @@ func GenerateEpubWebInfo(path string) Book {
 	metaTagList := opf.Metadata.Meta
 	itemList := opf.Manifest.Items
 
-	book.Path = path
+	epubsPathLen := len(epubsPath)
+	book.Path = ginEpubsStaticPath + path[epubsPathLen:]
 	if len(opf.Metadata.Title) > 0 {
 		book.Name = opf.Metadata.Title[0].Value
 	}
@@ -183,7 +186,7 @@ func GenerateEpubWebInfo(path string) Book {
 								}
 							}
 
-							book.CoverPath = coverPathInSys
+							book.CoverPath = ginEpubsStaticPath + coverPathInSys[epubsPathLen:]
 							goto end
 						}
 					}

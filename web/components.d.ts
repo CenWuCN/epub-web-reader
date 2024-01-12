@@ -7,8 +7,13 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    BookInfo: typeof import('./src/components/BookInfo.vue')['default']
+    BookShelf: typeof import('./src/components/BookShelf.vue')['default']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElRow: typeof import('element-plus/es')['ElRow']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    Reader: typeof import('./src/components/Reader.vue')['default']
+    RouterLink: typeof import('vue-router')['RouterLink']
+    RouterView: typeof import('vue-router')['RouterView']
   }
 }

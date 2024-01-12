@@ -12,7 +12,8 @@
     "element-plus": "^2.4.4",
     "epubjs": "^0.3.93",
     "jszip": "^3.10.1",
-    "vue": "^3.3.11"
+    "vue": "^3.3.11",
+    "vue-router": "4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",
