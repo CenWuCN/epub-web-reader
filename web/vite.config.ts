@@ -18,9 +18,15 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     proxy: {
-      "/doc": {
-        target: 'http://192.168.31.180:80',
+      "/epubs": {
+        target: 'http://192.168.31.180:8080',
         changeOrigin: true,
+        // rewrite: path => path.replace(/^\/epubs/, ''),
+      },
+      "/api": {
+        target: 'http://192.168.31.180:8080',
+        changeOrigin: true,
+        // rewrite: path => path.replace(/^\/api/, ''),
       }
     }
   },

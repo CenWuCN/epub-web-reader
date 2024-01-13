@@ -9,7 +9,7 @@ import { ref } from 'vue';
     }
 
     const bookinfos = ref<Array<bookinfo>>([])
-    fetch("/bookshelf")
+    fetch("/api/bookshelf")
         .then(response => response.json())
         .then(booktable => {
             console.log(booktable)
@@ -19,7 +19,11 @@ import { ref } from 'vue';
 
 <template>
     <div id="BookShelf">
-        <BookInfo />
+        <BookInfo v-for="bookinfo in bookinfos" 
+            :bookName="bookinfo.Name"
+            :bookCoverPath="bookinfo.CoverPath"
+            :bookPath = "bookinfo.Path"
+            />
     </div>
 </template>
 

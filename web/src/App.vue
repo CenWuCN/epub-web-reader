@@ -13,8 +13,17 @@
 </template>
 
 <style>
+#win {
+  min-width: 100%;
+  /* min-height: 100%; */
+  display: grid;
+  grid-template-columns: 2fr 6fr 2fr;
+  grid-template-rows: 100vh;
+}
 .blank{
   background-color: aqua;
-  width: 20%;
+}
+#content {
+  background-color: lightblue;
 }
 </style>

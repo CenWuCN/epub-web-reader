@@ -108,8 +108,9 @@ func main() {
 
 	router := gin.Default()
 	router.Static(ginEpubsStaticPath, epubsPath)
-	router.GET("/bookshelf", func(c *gin.Context) {
+	router.GET("/api/bookshelf", func(c *gin.Context) {
 		c.JSON(http.StatusOK, exampleUser.Books)
+		// c.String(http.StatusOK, fmt.Sprintf())
 	})
 
 	router.Run()
