@@ -54,9 +54,11 @@ let book = ePub("/epubs/11.epub");
 let rendition = book.renderTo("area", { flow: "scrolled-doc", width: "800" });
 let displayed = rendition.display();
 rendition.themes.font("微软雅黑")
+rendition.themes.register("default", {body:{color:"#d0d3d8", background:"#1c1c1d"}})
+rendition.themes.select("default")
 
 let toclist = ref(Array<TocItem>)
-
+const table = ref(false)
 
 book.loaded.navigation.then((navi) => {
   console.log(navi.toc)
@@ -100,19 +102,46 @@ async function JumpToToc(link: string): void {
     <div class="app_content">
       <div id='area'></div>
     </div>
-    <!-- <el-drawer>
-
-    </el-drawer> -->
+    <el-button id="toc_btn" text @click="table = true">
+      目录
+      </el-button>
+    <el-drawer
+      v-model="table"
+      direction="rtl"
+      size="30%"
+      >
+      <div id="toc">
+          <ul>
+            <li v-for="item in toclist" @click="JumpToToc(item.href)">{{ item.label }}</li>
+          </ul>
+        </div>
+    </el-drawer>
 </template>
 
 <style scoped>
 .app_content {
-  min-height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100vh;
   min-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #262628;
+}
+#area {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #toc-container {
   position: relative;
+}
+
+#toc_btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
 }
 
 li {

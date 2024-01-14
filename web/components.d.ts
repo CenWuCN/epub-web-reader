@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     BookInfo: typeof import('./src/components/BookInfo.vue')['default']
     BookShelf: typeof import('./src/components/BookShelf.vue')['default']
+    ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElRow: typeof import('element-plus/es')['ElRow']
