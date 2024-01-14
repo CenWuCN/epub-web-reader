@@ -18,18 +18,37 @@ import { ref } from 'vue';
 </script>
 
 <template>
-    <div id="BookShelf">
-        <BookInfo v-for="bookinfo in bookinfos" 
-            :bookName="bookinfo.Name"
-            :bookCoverPath="bookinfo.CoverPath"
-            :bookPath = "bookinfo.Path"
-            />
+    <div id = "container">
+        <div id="app_content">
+            <div id="BookShelf">
+                <BookInfo v-for="bookinfo in bookinfos" 
+                    :bookName="bookinfo.Name"
+                    :bookCoverPath="bookinfo.CoverPath"
+                    :bookPath = "bookinfo.Path"
+                    />
+            </div>
+        </div>
     </div>
+
 </template>
 
-<style>
+<style scoped>
+#container {
+    background-color: #1c1c1d;
+    min-width: 100%;
+    min-height: 100vh;
+}
+#app_content {
+    max-width: 1120px;
+    padding-top: 72px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #1c1c1d;
+}
 #BookShelf {
     display: flex;
     flex-wrap: wrap;
+    margin: auto;
 }
+
 </style>

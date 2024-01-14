@@ -97,27 +97,18 @@ async function JumpToToc(link: string): void {
 </script>
 
 <template>
-
-    <div class="content">
-    <div id='area'></div>
+    <div class="app_content">
+      <div id='area'></div>
     </div>
+    <!-- <el-drawer>
 
+    </el-drawer> -->
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.app_content {
+  min-height: 100%;
+  min-width: 1000px;
 }
 
 #toc-container {
@@ -133,4 +124,5 @@ li {
 ul {
   height: 800px;
 }
+
 </style>

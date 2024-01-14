@@ -10,6 +10,7 @@ declare module 'vue' {
     BookInfo: typeof import('./src/components/BookInfo.vue')['default']
     BookShelf: typeof import('./src/components/BookShelf.vue')['default']
     ElCol: typeof import('element-plus/es')['ElCol']
+    ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElRow: typeof import('element-plus/es')['ElRow']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     Reader: typeof import('./src/components/Reader.vue')['default']
