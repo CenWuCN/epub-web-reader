@@ -216,7 +216,7 @@ div {
 .control_btns {
   position: fixed;
   left: 50%;
-  margin-left: 548px;
+  margin-left: calc(var(--epubwidth) /2 + var(--epubwidth)/100);
   bottom: 48px;
   width: 48px;
   display: flex;
