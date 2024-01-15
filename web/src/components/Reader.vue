@@ -3,7 +3,7 @@
 import JSZip from 'jszip'
 import ePub, { NavItem } from 'epubjs'
 import { ref } from 'vue'
-import { routerKey, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import router from "../router"
 
 // // 创建一个 MutationObserver 实例
@@ -52,12 +52,13 @@ function GetTocList(toc: NavItem[], j: number): Array<TocItem> {
   return toclist
 }
 
+const epubwidth : string= "800px"
 const route = useRoute()
 console.log(route.params.bookpath)
 let bookpath = "/" + route.params.bookpath.join("/")
 console.log(bookpath)
 let book = ePub(bookpath);
-let rendition = book.renderTo("area", { flow: "scrolled-doc", width: "800" });
+let rendition = book.renderTo("area", { flow: "scrolled-doc", width: epubwidth });
 let displayed = rendition.display();
 
 rendition.themes.font("微软雅黑")
@@ -77,6 +78,13 @@ book.loaded.navigation.then((navi) => {
   console.log(navi.toc)
   toclist.value = GetTocList(navi.toc, 0)
   console.log(toclist)
+
+  var next = document.getElementById("next");
+  next.addEventListener("click", function(e){
+    window.scrollTo(0,0);
+    rendition.next();
+    e.preventDefault();
+  }, false);
 })
 
 book.loaded.metadata.then((metadata)=>{
@@ -84,7 +92,6 @@ book.loaded.metadata.then((metadata)=>{
 })
 
 let reg = /#(.*)/
-
 
 async function JumpToToc(link: string): void {
   console.log("点击目录")
@@ -126,7 +133,13 @@ function JumpToBookShelf(){
 <template>
     <div class="app_content">
       <div id='area'></div>
+      <div id="blank" :style="{'--epubwidth': epubwidth}">
+        <div class="next_chapter">
+          <el-button id="next" class="control_btn" href="#next">下一章</el-button>
+        </div>
+      </div>
     </div>
+    
     <div class="control_btns">
       <el-button class="control_btn" @click="table = true">目录</el-button>
       <el-button class="control_btn" @click="JumpToBookShelf">书架</el-button>
@@ -150,10 +163,15 @@ function JumpToBookShelf(){
 </template>
 
 <style scoped>
+
+div {
+  --epubwidth: 800px;
+}
+
 .app_content {
   display: flex;
   align-items: flex-start;
-  justify-content: center;
+  flex-direction: column;
   min-height: 100vh;
   min-width: 1000px;
   margin-left: auto;
@@ -163,6 +181,32 @@ function JumpToBookShelf(){
 #area {
   margin-left: auto;
   margin-right: auto;
+}
+
+.next_chapter {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#next {
+  margin-top: 100px;
+  width: 400px;
+  height: 60px;
+  font-size: 16px;
+  background-color: #333334;
+  color: #eef0f4;
+}
+
+#next:hover {
+  background-color: #282829;
+}
+
+#blank {
+  width: var(--epubwidth);
+  height: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #1c1c1d;
 }
 
 #toc-container {
