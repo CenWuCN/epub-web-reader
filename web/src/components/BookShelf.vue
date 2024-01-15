@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import router from '../router';
 import BookInfo from './BookInfo.vue';
 import { ref } from 'vue';
     
@@ -15,13 +16,17 @@ import { ref } from 'vue';
             console.log(booktable)
             bookinfos.value = booktable
             })
+
+    function JumptoReader(bookPath: string){
+        router.push("/reader"+ bookPath)
+    }
 </script>
 
 <template>
     <div id = "container">
         <div id="app_content">
             <div id="BookShelf">
-                <BookInfo v-for="bookinfo in bookinfos" 
+                <BookInfo @click="JumptoReader(bookinfo.Path)" v-for="bookinfo in bookinfos" 
                     :bookName="bookinfo.Name"
                     :bookCoverPath="bookinfo.CoverPath"
                     :bookPath = "bookinfo.Path"

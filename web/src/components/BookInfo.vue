@@ -4,6 +4,7 @@ const props = defineProps({
     bookCoverPath: String,
     bookPath: String
 })
+
 </script>
 
 <template>

@@ -9,7 +9,7 @@ const router = createRouter({
     routes:[
         // { path:"/", component: app}
         { path:"/bookshelf", component: bookshelf},
-        { path:"/reader", component: reader}
+        { path:"/reader/:bookpath*", component: reader}
     ]
 })
 

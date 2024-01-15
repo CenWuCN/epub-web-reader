@@ -3,6 +3,8 @@
 import JSZip from 'jszip'
 import ePub, { NavItem } from 'epubjs'
 import { ref } from 'vue'
+import { routerKey, useRoute } from 'vue-router';
+import router from "../router"
 
 // // 创建一个 MutationObserver 实例
 // let observer = new MutationObserver(function(mutations) {
@@ -50,20 +52,35 @@ function GetTocList(toc: NavItem[], j: number): Array<TocItem> {
   return toclist
 }
 
-let book = ePub("/epubs/11.epub");
+const route = useRoute()
+console.log(route.params.bookpath)
+let bookpath = "/" + route.params.bookpath.join("/")
+console.log(bookpath)
+let book = ePub(bookpath);
 let rendition = book.renderTo("area", { flow: "scrolled-doc", width: "800" });
 let displayed = rendition.display();
+
 rendition.themes.font("微软雅黑")
-rendition.themes.register("default", {body:{color:"#d0d3d8", background:"#1c1c1d"}})
+rendition.themes.fontSize("18px")
+rendition.themes.default({ ".p": { "line-height":"4 !important"}})
+rendition.themes.register("default", {
+  body:{color:"#d0d3d8", background:"#1c1c1d", lineHeight:"2"},
+})
 rendition.themes.select("default")
+
 
 let toclist = ref(Array<TocItem>)
 const table = ref(false)
+const booktitle = ref("")
 
 book.loaded.navigation.then((navi) => {
   console.log(navi.toc)
   toclist.value = GetTocList(navi.toc, 0)
   console.log(toclist)
+})
+
+book.loaded.metadata.then((metadata)=>{
+  booktitle.value = metadata.title
 })
 
 let reg = /#(.*)/
@@ -72,28 +89,36 @@ let reg = /#(.*)/
 async function JumpToToc(link: string): void {
   console.log("点击目录")
   rendition.display(link).then(()=>{
+    console.log(link)
     let tocInHtmlId = reg.exec(link)
-    console.log(tocInHtmlId[1])
-    console.log(typeof(tocInHtmlId[1]))
-    
-    // await nextTick()
-    // let el = document.getElementById(tocInHtmlId[1])
-    let iframes = document.getElementsByTagName("iframe")
-    console.log(iframes[0].id)
-    let innerDoc = iframes[0].contentDocument || iframes[0].contentWindow?.document
-    let el = innerDoc?.getElementById(tocInHtmlId[1])
-    // let el = document.querySelector(".chapterCaption")
+    if (tocInHtmlId !== null) {
+      console.log(tocInHtmlId)
+      console.log(typeof(tocInHtmlId[1]))
+      
+      // await nextTick()
+      // let el = document.getElementById(tocInHtmlId[1])
+      let iframes = document.getElementsByTagName("iframe")
+      console.log(iframes[0].id)
+      let innerDoc = iframes[0].contentDocument || iframes[0].contentWindow?.document
+      let el = innerDoc?.getElementById(tocInHtmlId[1])
+      // let el = document.querySelector(".chapterCaption")
 
-    // console.log(el)
-    // el.scrollIntoView({behavior:'smooth'})
-    var offsetTop = el.offsetTop;
+      // console.log(el)
+      // el.scrollIntoView({behavior:'smooth'})
+      var offsetTop = el?.offsetTop;
 
-    // 滚动到目标元素的位置
-      console.log(offsetTop)
-      window.scrollTo(0, offsetTop);
+      // 滚动到目标元素的位置
+        console.log(offsetTop)
+        window.scrollTo(0, offsetTop);
+    }
+
 
   })
 
+}
+
+function JumpToBookShelf(){
+  router.push("/bookshelf")
 }
 
 </script>
@@ -102,20 +127,26 @@ async function JumpToToc(link: string): void {
     <div class="app_content">
       <div id='area'></div>
     </div>
-    <el-button id="toc_btn" text @click="table = true">
-      目录
-      </el-button>
-    <el-drawer
-      v-model="table"
-      direction="rtl"
-      size="30%"
-      >
-      <div id="toc">
+    <div class="control_btns">
+      <el-button class="control_btn" @click="table = true">目录</el-button>
+      <el-button class="control_btn" @click="JumpToBookShelf">书架</el-button>
+    </div>
+    <div class="drawer">
+      <el-drawer
+        :title=booktitle
+        v-model="table"
+        direction="rtl"
+        size="30%"
+        :style="{ background: '#3a3a3c',color: '#eef0f4' }"
+        >
+        <div id="toc">
           <ul>
             <li v-for="item in toclist" @click="JumpToToc(item.href)">{{ item.label }}</li>
           </ul>
         </div>
-    </el-drawer>
+      </el-drawer>
+    </div>
+
 </template>
 
 <style scoped>
@@ -138,16 +169,42 @@ async function JumpToToc(link: string): void {
   position: relative;
 }
 
-#toc_btn {
+.control_btns {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  left: 50%;
+  margin-left: 548px;
+  bottom: 48px;
+  width: 48px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.control_btn{
+  margin-top: 24px;
+  margin-left: 0px;
+  background-color: #1c1c1d;
+  border: 0;
+}
+
+.el-drawer__title {
+  color: #eef0f4;
 }
 
 li {
   list-style: none;
   text-align: left;
   white-space: pre;
+}
+
+li:hover {
+  background-color: #3474b4;
+}
+
+li:active,
+li:visited,
+li:focus {
+  color: #0097ff;
 }
 
 ul {
