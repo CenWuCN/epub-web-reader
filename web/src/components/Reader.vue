@@ -55,20 +55,60 @@ function GetTocList(toc: NavItem[], j: number): Array<TocItem> {
 const epubwidth : string= "500px"
 const route = useRoute()
 console.log(route.params.bookpath)
-let bookpath = "/" + route.params.bookpath.join("/")
-console.log(bookpath)
-let book = ePub(bookpath);
-let rendition = book.renderTo("area", { flow: "scrolled-doc", width: epubwidth });
-let displayed = rendition.display();
+// let bookpath = "/" + route.params.bookpath.join("/")
+// console.log(bookpath)
+let book = ePub("/epubs/11/OEBPS/content.opf");
+// let rendition = book.renderTo("area", { flow: "scrolled-doc", width: epubwidth });
+// let displayed = rendition.display();
 
-rendition.themes.font("微软雅黑")
-rendition.themes.fontSize("18px")
-rendition.themes.default({ ".p": { "line-height":"4 !important"}})
-rendition.themes.register("default", {
-  body:{color:"#d0d3d8", background:"#1c1c1d", lineHeight:"2"},
-})
-rendition.themes.select("default")
+// rendition.themes.font("微软雅黑")
+// rendition.themes.fontSize("18px")
+// rendition.themes.default({ ".p": { "line-height":"4 !important"}})
+// rendition.themes.register("default", {
+//   body:{color:"#d0d3d8", background:"#1c1c1d", lineHeight:"2"},
+// })
+// rendition.themes.select("default")
+let area = document.getElementById("area")
 
+let reg = /#(.*)/
+
+function display(link: string){
+  let section = book.spine.get(link)
+  console.log("获取到的 section", section)
+
+  console.log(link)
+  let tocInHtmlId = reg.exec(link)
+  console.log(tocInHtmlId)
+  if (section) {
+    section.render().then(function(html){
+      console.log("需要渲染的 html", html)
+      area = document.getElementById("area")
+      if (area !== null){
+
+        console.log("设置 html")
+        area.innerHTML = html
+        area.style.color = "#d0d3d8"
+        area.style.backgroundColor = "#1c1c1d"
+        area.style.fontSize = "18px"
+        area.style.lineHeight="4em"
+
+        if (tocInHtmlId !== null){
+          let el = document.getElementById(tocInHtmlId[1])
+          el?.scrollIntoView({behavior:'smooth'})
+        }
+
+        var next = document.getElementById("next_btn");
+        next.addEventListener("click", function(e){
+          window.scrollTo(0,0);
+          let spineitem = section.next();
+          console.log(spineitem)
+          display(spineitem.href)
+          e.preventDefault();
+        }, false);
+      }
+    })
+  }
+}
 
 let toclist = ref(Array<TocItem>)
 const table = ref(false)
@@ -79,48 +119,19 @@ book.loaded.navigation.then((navi) => {
   toclist.value = GetTocList(navi.toc, 0)
   console.log(toclist)
 
-  var next = document.getElementById("next");
-  next.addEventListener("click", function(e){
-    window.scrollTo(0,0);
-    rendition.next();
-    e.preventDefault();
-  }, false);
+  display(toclist.value[0].href)
+
 })
 
 book.loaded.metadata.then((metadata)=>{
   booktitle.value = metadata.title
 })
 
-let reg = /#(.*)/
 
-async function JumpToToc(link: string): void {
+
+async function JumpToToc(link: string) {
   console.log("点击目录")
-  rendition.display(link).then(()=>{
-    console.log(link)
-    let tocInHtmlId = reg.exec(link)
-    if (tocInHtmlId !== null) {
-      console.log(tocInHtmlId)
-      console.log(typeof(tocInHtmlId[1]))
-      
-      // await nextTick()
-      // let el = document.getElementById(tocInHtmlId[1])
-      let iframes = document.getElementsByTagName("iframe")
-      console.log(iframes[0].id)
-      let innerDoc = iframes[0].contentDocument || iframes[0].contentWindow?.document
-      let el = innerDoc?.getElementById(tocInHtmlId[1])
-      // let el = document.querySelector(".chapterCaption")
-
-      // console.log(el)
-      // el.scrollIntoView({behavior:'smooth'})
-      var offsetTop = el?.offsetTop;
-
-      // 滚动到目标元素的位置
-        console.log(offsetTop)
-        window.scrollTo(0, offsetTop);
-    }
-
-
-  })
+  display(link)
 
 }
 
@@ -132,12 +143,13 @@ function JumpToBookShelf(){
 
 <template>
     <div class="app_content">
-      <div id='area'></div>
-      <div id="blank" :style="{'--epubwidth': epubwidth}">
+      <div id="reader">
+        <div id='area'></div>
         <div class="next_chapter">
-          <el-button id="next" class="control_btn" href="#next">下一章</el-button>
+          <el-button id="next_btn" class="control_btn" href="#next">下一章</el-button>
         </div>
       </div>
+
     </div>
     
     <div class="control_btns">
@@ -149,7 +161,6 @@ function JumpToBookShelf(){
         :title=booktitle
         v-model="table"
         direction="rtl"
-        size="30%"
         :style="{ background: '#3a3a3c',color: '#eef0f4' }"
         >
         <div id="toc">
@@ -172,23 +183,44 @@ div {
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  min-height: 100vh;
-  min-width: 1000px;
+  height: auto;
+  min-height: 100dvh;
+  width: 100vw;
   margin-left: auto;
   margin-right: auto;
   background-color: #262628;
 }
+#reader {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 1000px;
+  height: auto;
+  min-height: 100dvh;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #1c1c1d;
+}
 #area {
   margin-left: auto;
   margin-right: auto;
+  width: 798px;
+  height: auto;
+  color:"#d0d3d8";
+  background-color:"#1c1c1d",
+}
+.p{
+  color: #d0d3d8;
 }
 
 .next_chapter {
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 0;
+  height: 260px;
 }
 
-#next {
+#next_btn {
   margin-top: 100px;
   width: 400px;
   height: 60px;
@@ -197,7 +229,7 @@ div {
   color: #eef0f4;
 }
 
-#next:hover {
+#next_btn:hover {
   background-color: #282829;
 }
 
@@ -253,6 +285,35 @@ li:focus {
 
 ul {
   height: 800px;
+}
+
+@media screen and (width < 768px) {
+  .app_content{
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+  }
+  #reader {
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+  }
+  #area {
+    width: 90%;
+    height: auto;
+  }
+  #next_btn {
+    width: 80dvw;
+    height: 4rem;
+  }
+  .control_btns {
+    position: fixed;
+    margin-left: 80dvw;
+    left: 0dvw;
+  }
+  .drawer {
+    width: 80dvw;
+  }
 }
 
 </style>
