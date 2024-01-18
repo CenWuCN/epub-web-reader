@@ -52,7 +52,7 @@ function GetTocList(toc: NavItem[], j: number): Array<TocItem> {
   return toclist
 }
 
-const epubwidth : string= "800px"
+const epubwidth : string= "500px"
 const route = useRoute()
 console.log(route.params.bookpath)
 let bookpath = "/" + route.params.bookpath.join("/")
