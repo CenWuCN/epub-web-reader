@@ -3,8 +3,10 @@
 import JSZip from 'jszip'
 import ePub, { NavItem } from 'epubjs'
 import { ref } from 'vue'
-import { useRoute } from 'vue-router';
 import router from "../router"
+import {useStore} from '../stores/store'
+
+const store = useStore()
 
 interface TocItem {
   id: string;
@@ -32,11 +34,13 @@ function GetTocList(toc: NavItem[], j: number): Array<TocItem> {
   return toclist
 }
 
-const route = useRoute()
-console.log(route.params.bookpath)
-// let bookpath = "/" + route.params.bookpath.join("/")
-// console.log(bookpath)
-let book = ePub("/epubs/11/OEBPS/content.opf")
+console.log(store.opfPath)
+var opfPath = store.opfPath
+if (opfPath == "") {
+  opfPath = localStorage.getItem("opf")
+}
+
+let book = ePub(opfPath)
 
 let area = document.getElementById("area")
 

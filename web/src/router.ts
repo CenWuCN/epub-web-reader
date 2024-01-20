@@ -8,8 +8,8 @@ const router = createRouter({
     history: createWebHistory(),
     routes:[
         // { path:"/", component: app}
-        { path:"/bookshelf", component: bookshelf},
-        { path:"/reader", component: reader}
+        { name:"bookShelf", path:"/bookshelf", component: bookshelf},
+        { name:"Reader", path:"/reader", component: reader, props:{data:"data"}}
     ]
 })
 

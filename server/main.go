@@ -13,7 +13,7 @@ import (
 
 func main() {
 
-	account.CreateUser("example", "example", "")
+	// account.CreateUser("example", "example", "")
 
 	exampleUser, err := account.GetUserById("example")
 	if err != nil {
@@ -31,9 +31,11 @@ func main() {
 			return filepath.SkipDir
 		}
 		fmt.Printf("visited file or dir: %q\n", path)
-		book, err := exampleUser.UnzipAndGenerateEpubWebInfo(path)
-		if err == nil {
-			books := append(books, *book)
+		if filepath.Ext(path) == ".epub" {
+			book, err := exampleUser.UnzipAndGenerateEpubWebInfo(path)
+			if err == nil {
+				books = append(books, *book)
+			}
 		}
 
 		return nil
