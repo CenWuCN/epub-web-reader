@@ -1,1 +1,3 @@
 epubsPath: "~/Documents/epubs/"
+unzipPath: "~/Documents/epubs/books/"
+ginEpubsStaticPath: "/epubs"
