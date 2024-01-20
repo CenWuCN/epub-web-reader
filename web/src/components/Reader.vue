@@ -6,26 +6,6 @@ import { ref } from 'vue'
 import { useRoute } from 'vue-router';
 import router from "../router"
 
-// // 创建一个 MutationObserver 实例
-// let observer = new MutationObserver(function(mutations) {
-//   mutations.forEach(function(mutation) {
-//     // 在这里处理元素创建的逻辑
-//     if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-//       // 处理新添加的元素
-//       console.log('新元素已创建:', mutation.addedNodes);
-//     }
-//   });
-// });
-
-// // 选择要观察的目标节点
-// let targetNode = document.body;
-
-// // 配置观察选项（此处配置为监视子节点的变化）
-// let config = { childList: true, subtree: true };
-
-// // 传入目标节点和观察选项开始观察
-// observer.observe(targetNode, config);
-
 interface TocItem {
   id: string;
   href: string;
@@ -52,22 +32,12 @@ function GetTocList(toc: NavItem[], j: number): Array<TocItem> {
   return toclist
 }
 
-const epubwidth : string= "500px"
 const route = useRoute()
 console.log(route.params.bookpath)
 // let bookpath = "/" + route.params.bookpath.join("/")
 // console.log(bookpath)
-let book = ePub("/epubs/11/OEBPS/content.opf");
-// let rendition = book.renderTo("area", { flow: "scrolled-doc", width: epubwidth });
-// let displayed = rendition.display();
+let book = ePub("/epubs/11/OEBPS/content.opf")
 
-// rendition.themes.font("微软雅黑")
-// rendition.themes.fontSize("18px")
-// rendition.themes.default({ ".p": { "line-height":"4 !important"}})
-// rendition.themes.register("default", {
-//   body:{color:"#d0d3d8", background:"#1c1c1d", lineHeight:"2"},
-// })
-// rendition.themes.select("default")
 let area = document.getElementById("area")
 
 let reg = /#(.*)/
@@ -174,11 +144,6 @@ function JumpToBookShelf(){
 </template>
 
 <style scoped>
-
-div {
-  --epubwidth: 800px;
-}
-
 .app_content {
   display: flex;
   align-items: flex-start;
@@ -233,22 +198,13 @@ div {
   background-color: #282829;
 }
 
-#blank {
-  width: var(--epubwidth);
-  height: 300px;
-  margin-left: auto;
-  margin-right: auto;
-  background-color: #1c1c1d;
-}
-
 #toc-container {
   position: relative;
 }
 
 .control_btns {
   position: fixed;
-  left: 50%;
-  margin-left: calc(var(--epubwidth) /2 + var(--epubwidth)/100);
+  left: 80dvw;
   bottom: 48px;
   width: 48px;
   display: flex;
