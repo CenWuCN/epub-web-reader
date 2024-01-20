@@ -154,7 +154,7 @@ function JumpToBookShelf(){
   flex-direction: column;
   height: auto;
   min-height: 100dvh;
-  width: 100vw;
+  width: 100dvw;
   margin-left: auto;
   margin-right: auto;
   background-color: #262628;
