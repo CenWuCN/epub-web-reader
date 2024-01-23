@@ -4,9 +4,12 @@ import (
 	"epub-reader-web-server/setting"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pirmd/epub"
 	"gopkg.in/yaml.v3"
@@ -34,7 +37,12 @@ var CoverTagName string = "cover"
 var EpubExt = ".epub"
 var OpfExt = ".opf"
 
-var timestring = ""
+var LastTimestamp int64 = 0
+var randomNum int = 0
+
+func Init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func CreateUser(id string, name string, pw string) {
 	u := User{id, name, pw, []Book{}}
@@ -108,6 +116,21 @@ func (u *User) UnzipAndGenerateEpubWebInfo(epubAbsPath string) (*Book, error) {
 		book.Name = opf.Metadata.Title[0].Value
 	}
 
+	currentTimestamp := time.Now().Unix()
+	if currentTimestamp != LastTimestamp {
+		LastTimestamp = currentTimestamp
+		randomNum = rand.Intn(2 ^ 16)
+	} else {
+		randomNum++
+	}
+	timeStampHex := strconv.FormatInt(currentTimestamp, 16)
+	indexHex := strconv.FormatInt(int64(randomNum), 16)
+	if len(indexHex) > 4 {
+		indexHex = indexHex[len(indexHex)-4:]
+	}
+
+	book.Id = timeStampHex + fmt.Sprintf("%04s", indexHex)
+	// fmt.Println("bookid", book.Id, timeStampHex, randomNum, indexHex)
 	book.Path = setting.ConfigYaml.GinEpubsStaticPath + epubAbsPath[len(setting.EpubsAbsPath):]
 
 	metaTagList := opf.Metadata.Meta
