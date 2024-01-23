@@ -13,10 +13,12 @@ import (
 )
 
 type Book struct {
-	Name      string `yaml:"name"`
-	Path      string `yaml:"path"`
-	CoverPath string `yaml:"cover_path"`
-	Opf       string `yaml:"opf"`
+	Id         string `yaml:"id"`
+	Name       string `yaml:"name"`
+	Path       string `yaml:"path"`
+	CoverPath  string `yaml:"cover_path"`
+	Opf        string `yaml:"opf"`
+	ReadingPos string `yaml:"reading_pos"`
 }
 
 type User struct {
@@ -31,6 +33,8 @@ var YamlExt string = ".yaml"
 var CoverTagName string = "cover"
 var EpubExt = ".epub"
 var OpfExt = ".opf"
+
+var timestring = ""
 
 func CreateUser(id string, name string, pw string) {
 	u := User{id, name, pw, []Book{}}

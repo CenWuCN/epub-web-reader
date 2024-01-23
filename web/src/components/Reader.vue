@@ -44,10 +44,15 @@ let book = ePub(opfPath)
 
 let area = document.getElementById("area")
 
-let reg = /#(.*)/
 
-function display(link: string){
+
+let reg = /#(.*)/
+let currentSectionLink = ""
+let readingPos = 0
+
+function display(link: string, readingPos:number){
   let section = book.spine.get(link)
+  currentSectionLink = link
   console.log("获取到的 section", section)
 
   console.log(link)
@@ -55,7 +60,7 @@ function display(link: string){
   console.log(tocInHtmlId)
   if (section) {
     section.render().then(function(html){
-      console.log("需要渲染的 html", html)
+      // console.log("需要渲染的 html", html)
       area = document.getElementById("area")
       if (area !== null){
 
@@ -65,18 +70,29 @@ function display(link: string){
         area.style.backgroundColor = "#1c1c1d"
         area.style.fontSize = "18px"
         area.style.lineHeight="4em"
-
-        if (tocInHtmlId !== null){
-          let el = document.getElementById(tocInHtmlId[1])
-          el?.scrollIntoView({behavior:'smooth'})
+        
+        if (readingPos == 0){
+          if (tocInHtmlId !== null){
+            let el = document.getElementById(tocInHtmlId[1])
+            el?.scrollIntoView({behavior:'smooth'})
+          }
+        }else{
+          setTimeout(function(){
+            let y = document.body.scrollHeight * Number(readingPos)
+              window.scrollTo({
+                top: y,
+                behavior:"smooth"
+              })
+          }, 500)
         }
 
+        
         var next = document.getElementById("next_btn");
         next.addEventListener("click", function(e){
           window.scrollTo(0,0);
           let spineitem = section.next();
           console.log(spineitem)
-          display(spineitem.href)
+          display(spineitem.href, 0)
           e.preventDefault();
         }, false);
       }
@@ -93,7 +109,16 @@ book.loaded.navigation.then((navi) => {
   toclist.value = GetTocList(navi.toc, 0)
   console.log(toclist)
 
-  display(toclist.value[0].href)
+  currentSectionLink = localStorage.getItem("link")
+  readingPos = localStorage.getItem("readingPos")
+  if (currentSectionLink == ""){
+    display(toclist.value[0].href, 0)
+  }
+  else{
+    console.log("重新刷新", currentSectionLink, readingPos)
+    display(currentSectionLink, readingPos)
+  }
+  
 
 })
 
@@ -101,17 +126,33 @@ book.loaded.metadata.then((metadata)=>{
   booktitle.value = metadata.title
 })
 
-
-
 async function JumpToToc(link: string) {
   console.log("点击目录")
-  display(link)
+  display(link, 0)
 
 }
 
 function JumpToBookShelf(){
   router.push("/bookshelf")
 }
+
+window.addEventListener("scrollend", function(){
+  console.log(window.scrollY)
+  console.log(document.body.scrollHeight)
+  console.log("保存数值", currentSectionLink, document.body.scrollHeight, window.scrollY, window.scrollY/document.body.scrollHeight)
+
+  let readingPos = window.scrollY/document.body.scrollHeight
+
+  let data = new FormData()
+  data.append("opf", store.opfPath)
+  data.append("link", currentSectionLink)
+  data.append("percentage", String(readingPos))
+  this.fetch("/api/setreadingpos", {
+    method:"POST",
+    body: data
+  })
+})
+
 
 </script>
 
