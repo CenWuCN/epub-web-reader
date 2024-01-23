@@ -11,7 +11,7 @@ const router = createRouter({
         // { path:"/", component: app}
         { name:"bookShelf", path:"/bookshelf", component: bookShelf},
         { name:"reader", path:"/reader", component: reader},
-        { name:"rogin", path:"/login", component: login}
+        { name:"login", path:"/login", component: login}
     ]
 })
 
