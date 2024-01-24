@@ -23,6 +23,7 @@ let currentSection
 let toclist = ref(Array<TocItem>)
 const table = ref(false)
 const booktitle = ref("")
+const drawerwidth = ref("")
 
 const route = useRoute()
 let bookid = route.params.bookid
@@ -165,6 +166,14 @@ window.addEventListener("scrollend", function(){
   })
 })
 
+window.addEventListener("resize", function(){
+  if (window.innerWidth < 768){
+    drawerwidth.value = "80%"
+  }
+  else{
+    drawerwidth.value = "30%"
+  }
+})
 
 </script>
 
@@ -188,6 +197,7 @@ window.addEventListener("scrollend", function(){
         :title=booktitle
         v-model="table"
         direction="rtl"
+        :size = "drawerwidth"
         :style="{ background: '#3a3a3c',color: '#eef0f4' }"
         >
         <div id="toc">
@@ -323,9 +333,6 @@ ul {
     position: fixed;
     margin-left: 80dvw;
     left: 0dvw;
-  }
-  .drawer {
-    width: 80dvw;
   }
 }
 
