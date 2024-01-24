@@ -1,19 +1,13 @@
 <script setup lang="ts">
 import router from '../router';
-import BookInfo from './BookInfo.vue';
+import BookInfoComp from './BookInfoComp.vue';
 import { ref } from 'vue';
 import {useStore} from '../stores/store'
+import BookInfo from '../datastruct/BookInfo'
 
 const store = useStore()
 
-interface bookinfo {
-    Name: string
-    Path: string
-    CoverPath: string
-    Opf: string
-}
-
-const bookinfos = ref<Array<bookinfo>>([])
+const bookinfos = ref<Array<BookInfo>>([])
 fetch("/api/bookshelf")
     .then(response => response.json())
     .then(booktable => {
@@ -21,12 +15,10 @@ fetch("/api/bookshelf")
         bookinfos.value = booktable
         })
 
-function JumptoReader(bookOpf: string){
-    store.opfPath = bookOpf
-    localStorage.setItem("opf", bookOpf)
-    router.push({
-        name:"Reader",
-    })
+function JumptoReader(bookid: string){
+    // store.opfPath = bookid
+    // localStorage.setItem("opf", bookid)
+    router.push("/reader/"+ bookid)
 }
 </script>
 
@@ -34,7 +26,7 @@ function JumptoReader(bookOpf: string){
     <div id = "container">
         <div id="app_content">
             <div id="BookShelf">
-                <BookInfo @click="JumptoReader(bookinfo.Opf)" v-for="bookinfo in bookinfos" 
+                <BookInfoComp @click="JumptoReader(bookinfo.Id)" v-for="bookinfo in bookinfos" 
                     :bookName="bookinfo.Name"
                     :bookCoverPath="bookinfo.CoverPath"
                     :bookPath = "bookinfo.Path"

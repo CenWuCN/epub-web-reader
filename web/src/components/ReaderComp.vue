@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// import HelloWorld from './components/HelloWorld.vue'
+
 import JSZip from 'jszip'
 import ePub, { NavItem } from 'epubjs'
 import { ref } from 'vue'
@@ -13,6 +13,46 @@ interface TocItem {
   href: string;
   label: string;
 }
+
+console.log(store.opfPath)
+var opfPath = store.opfPath
+if (opfPath == "") {
+  opfPath = localStorage.getItem("opf")
+}
+
+let reg = /#(.*)/
+let currentSectionLink = ""
+let readingPos = 0
+let currentSection
+let toclist = ref(Array<TocItem>)
+const table = ref(false)
+const booktitle = ref("")
+
+let book = ePub(opfPath)
+
+let area = document.getElementById("area")
+
+book.loaded.navigation.then((navi) => {
+  console.log(navi.toc)
+  toclist.value = GetTocList(navi.toc, 0)
+  console.log(toclist)
+
+  currentSectionLink = localStorage.getItem("link")
+  readingPos = localStorage.getItem("readingPos")
+  if (currentSectionLink == ""){
+    display(toclist.value[0].href, 0)
+  }
+  else{
+    console.log("重新刷新", currentSectionLink, readingPos)
+    display(currentSectionLink, readingPos)
+  }
+  
+
+})
+
+book.loaded.metadata.then((metadata)=>{
+  booktitle.value = metadata.title
+})
 
 function GetTocList(toc: NavItem[], j: number): Array<TocItem> {
   let spaces: string = ""
@@ -34,24 +74,9 @@ function GetTocList(toc: NavItem[], j: number): Array<TocItem> {
   return toclist
 }
 
-console.log(store.opfPath)
-var opfPath = store.opfPath
-if (opfPath == "") {
-  opfPath = localStorage.getItem("opf")
-}
-
-let book = ePub(opfPath)
-
-let area = document.getElementById("area")
-
-
-
-let reg = /#(.*)/
-let currentSectionLink = ""
-let readingPos = 0
-
 function display(link: string, readingPos:number){
   let section = book.spine.get(link)
+  currentSection = section
   currentSectionLink = link
   console.log("获取到的 section", section)
 
@@ -85,46 +110,10 @@ function display(link: string, readingPos:number){
               })
           }, 500)
         }
-
-        
-        var next = document.getElementById("next_btn");
-        next.addEventListener("click", function(e){
-          window.scrollTo(0,0);
-          let spineitem = section.next();
-          console.log(spineitem)
-          display(spineitem.href, 0)
-          e.preventDefault();
-        }, false);
       }
     })
   }
 }
-
-let toclist = ref(Array<TocItem>)
-const table = ref(false)
-const booktitle = ref("")
-
-book.loaded.navigation.then((navi) => {
-  console.log(navi.toc)
-  toclist.value = GetTocList(navi.toc, 0)
-  console.log(toclist)
-
-  currentSectionLink = localStorage.getItem("link")
-  readingPos = localStorage.getItem("readingPos")
-  if (currentSectionLink == ""){
-    display(toclist.value[0].href, 0)
-  }
-  else{
-    console.log("重新刷新", currentSectionLink, readingPos)
-    display(currentSectionLink, readingPos)
-  }
-  
-
-})
-
-book.loaded.metadata.then((metadata)=>{
-  booktitle.value = metadata.title
-})
 
 async function JumpToToc(link: string) {
   console.log("点击目录")
@@ -135,6 +124,15 @@ async function JumpToToc(link: string) {
 function JumpToBookShelf(){
   router.push("/bookshelf")
 }
+
+var next = document.getElementById("next_btn");
+next.addEventListener("click", function(e){
+  window.scrollTo(0,0);
+  let spineitem = currentSection.next();
+  console.log(spineitem)
+  display(spineitem.href, 0)
+  e.preventDefault();
+}, false);
 
 window.addEventListener("scrollend", function(){
   console.log(window.scrollY)

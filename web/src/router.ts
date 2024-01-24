@@ -1,17 +1,17 @@
 import {createRouter, createWebHistory} from 'vue-router'
 
-const reader = () => import("./components/Reader.vue")
-const bookShelf = () => import("./components/BookShelf.vue")
-const login = () => import("./components/Login.vue")
+const ReaderComp = () => import("./components/ReaderComp.vue")
+const BookShelfComp = () => import("./components/BookShelfComp.vue")
+const LoginComp = () => import("./components/LoginComp.vue")
 // const app = () => import("./App.vue")
 
 const router = createRouter({
     history: createWebHistory(),
     routes:[
         // { path:"/", component: app}
-        { name:"bookShelf", path:"/bookshelf", component: bookShelf},
-        { name:"reader", path:"/reader", component: reader},
-        { name:"login", path:"/login", component: login}
+        { name:"bookShelf", path:"/bookshelf", component: BookShelfComp},
+        { name:"reader", path:"/reader/:bookid", component: ReaderComp},
+        { name:"login", path:"/login", component: LoginComp}
     ]
 })
 
