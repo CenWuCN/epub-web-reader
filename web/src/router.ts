@@ -1,8 +1,8 @@
 import {createRouter, createWebHistory} from 'vue-router'
 
-const ReaderComp = () => import("./components/ReaderComp.vue")
-const BookShelfComp = () => import("./components/BookShelfComp.vue")
-const LoginComp = () => import("./components/LoginComp.vue")
+const ReaderComp = () => import("./views/ReaderComp.vue")
+const BookShelfComp = () => import("./views/BookShelfComp.vue")
+const LoginComp = () => import("./views/LoginComp.vue")
 // const app = () => import("./App.vue")
 
 const router = createRouter({

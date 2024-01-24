@@ -2,6 +2,7 @@ package account
 
 import (
 	"epub-reader-web-server/setting"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
@@ -15,13 +16,18 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type ReadingPos struct {
+	Link       string `yaml:"link"`
+	Percentage string `yaml:"percentage"`
+}
+
 type Book struct {
 	Id         string `yaml:"id"`
 	Name       string `yaml:"name"`
 	Path       string `yaml:"path"`
 	CoverPath  string `yaml:"cover_path"`
 	Opf        string `yaml:"opf"`
-	ReadingPos string `yaml:"reading_pos"`
+	ReadingPos ReadingPos
 }
 
 type User struct {
@@ -41,7 +47,7 @@ var LastTimestamp int64 = 0
 var randomNum int = 0
 
 func Init() {
-	rand.Seed(time.Now().UnixNano())
+	rand.NewSource(time.Now().UnixNano())
 }
 
 func CreateUser(id string, name string, pw string) {
@@ -92,13 +98,26 @@ func (u *User) DelBook(epubsRelPath string) {
 	}
 }
 
+func (u *User) GetBookInfo(id string) (*Book, error) {
+	books := u.Books
+	for index, bookinfo := range books {
+		if bookinfo.Id == id {
+			return &books[index], nil
+		}
+	}
+	return nil, errors.New(fmt.Sprintf("no book found with id %s", id))
+}
+
 func (u *User) Save() {
 	bytes, err := yaml.Marshal(&u)
 	if err != nil {
 		fmt.Println("save user data err", err)
 	}
 	accPath := filepath.Join(AccFolder, u.Id+YamlExt)
-	os.WriteFile(accPath, bytes, os.ModePerm)
+	err = os.WriteFile(accPath, bytes, os.ModePerm)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func (u *User) UnzipAndGenerateEpubWebInfo(epubAbsPath string) (*Book, error) {

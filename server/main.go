@@ -11,16 +11,15 @@ import (
 )
 
 func main() {
+	setting.Init()
 
 	// account.CreateUser("example", "example", "")
 
-	exampleUser, err := account.GetUserById("example")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	setting.Init()
-
+	// exampleUser, err := account.GetUserById("example")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 	// books := []account.Book{}
 	// filepath.Walk(setting.EpubsAbsPath, func(path string, info fs.FileInfo, err error) error {
 	// 	if err != nil {
@@ -46,8 +45,11 @@ func main() {
 	router := gin.Default()
 	router.Static(setting.ConfigYaml.GinEpubsStaticPath, setting.UnzipAbsPath)
 	router.GET("/api/bookshelf", func(ctx *gin.Context) {
+		exampleUser, err := account.GetUserById("example")
+		if err != nil {
+			return
+		}
 		ctx.JSON(http.StatusOK, exampleUser.Books)
-		// c.String(http.StatusOK, fmt.Sprintf())
 	})
 	router.POST("/api/login", func(ctx *gin.Context) {
 		id := ctx.PostForm("username")
@@ -78,6 +80,48 @@ func main() {
 		// id := ctx.PostForm("username")~
 		// pw := ctx.PostForm("password")
 		// invitecode := ctx.PostForm("invitecode")
+
+	})
+
+	router.POST("/api/readingposset", func(ctx *gin.Context) {
+		id := ctx.PostForm("id")
+		percentage := ctx.PostForm("percentage")
+		link := ctx.PostForm("link")
+		fmt.Println(id, percentage, link)
+		exampleUser, err := account.GetUserById("example")
+		if err != nil {
+			ctx.JSON(http.StatusOK, "")
+		} else {
+			fmt.Println("获取书数据")
+			bookinfo, err := exampleUser.GetBookInfo(id)
+			if err != nil {
+				ctx.JSON(http.StatusOK, "")
+				return
+			}
+			bookinfo.ReadingPos.Link = link
+			bookinfo.ReadingPos.Percentage = percentage
+			fmt.Println(bookinfo)
+			exampleUser.Save()
+		}
+		ctx.JSON(http.StatusOK, "")
+	})
+
+	router.POST("/api/bookinfo", func(ctx *gin.Context) {
+		id := ctx.PostForm("bookid")
+
+		exampleUser, err := account.GetUserById("example")
+		if err != nil {
+			ctx.JSON(http.StatusOK, "{}")
+		} else {
+			books := exampleUser.Books
+			for _, bookinfo := range books {
+				if bookinfo.Id == id {
+					ctx.JSON(http.StatusOK, bookinfo)
+					return
+				}
+			}
+			ctx.JSON(http.StatusOK, "{}")
+		}
 
 	})
 

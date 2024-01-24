@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import router from '../router';
-import BookInfoComp from './BookInfoComp.vue';
+import BookInfoComp from '../components/BookInfoComp.vue';
 import { ref } from 'vue';
 import {useStore} from '../stores/store'
 import BookInfo from '../datastruct/BookInfo'

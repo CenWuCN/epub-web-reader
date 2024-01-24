@@ -1,10 +1,12 @@
 <script setup lang="ts">
 
 import JSZip from 'jszip'
-import ePub, { NavItem } from 'epubjs'
-import { ref } from 'vue'
+import ePub, { NavItem, Book } from 'epubjs'
+import { onMounted, ref } from 'vue'
 import router from "../router"
 import {useStore} from '../stores/store'
+import BookInfo from '../datastruct/BookInfo'
+import { useRoute } from 'vue-router'
 
 const store = useStore()
 
@@ -12,12 +14,6 @@ interface TocItem {
   id: string;
   href: string;
   label: string;
-}
-
-console.log(store.opfPath)
-var opfPath = store.opfPath
-if (opfPath == "") {
-  opfPath = localStorage.getItem("opf")
 }
 
 let reg = /#(.*)/
@@ -28,31 +24,46 @@ let toclist = ref(Array<TocItem>)
 const table = ref(false)
 const booktitle = ref("")
 
-let book = ePub(opfPath)
+const route = useRoute()
+let bookid = route.params.bookid
 
+let data = new FormData()
+data.append("bookid", bookid)
+
+let book: Book
 let area = document.getElementById("area")
 
-book.loaded.navigation.then((navi) => {
-  console.log(navi.toc)
-  toclist.value = GetTocList(navi.toc, 0)
-  console.log(toclist)
+fetch("/api/bookinfo", {
+  method:"POST",
+  body:data
+})
+.then(response=>response.json())
+.then((bookinfo)=>{
+  console.log(bookinfo)
+  bookinfo as BookInfo
+  book = ePub(bookinfo.Opf)
+  book.loaded.navigation.then((navi) => {
+    console.log(navi.toc)
+    toclist.value = GetTocList(navi.toc, 0)
+    console.log(toclist)
 
-  currentSectionLink = localStorage.getItem("link")
-  readingPos = localStorage.getItem("readingPos")
-  if (currentSectionLink == ""){
-    display(toclist.value[0].href, 0)
-  }
-  else{
-    console.log("重新刷新", currentSectionLink, readingPos)
-    display(currentSectionLink, readingPos)
-  }
-  
-
+    currentSectionLink = bookinfo.ReadingPos.Link
+    readingPos = bookinfo.ReadingPos.Percentage
+    if (currentSectionLink == ""){
+      display(toclist.value[0].href, 0)
+    }
+    else{
+      console.log("重新刷新", currentSectionLink, readingPos)
+      display(currentSectionLink, readingPos)
+    }
 })
 
-book.loaded.metadata.then((metadata)=>{
-  booktitle.value = metadata.title
+  book.loaded.metadata.then((metadata)=>{
+    booktitle.value = metadata.title
+  })
 })
+
+
 
 function GetTocList(toc: NavItem[], j: number): Array<TocItem> {
   let spaces: string = ""
@@ -125,14 +136,17 @@ function JumpToBookShelf(){
   router.push("/bookshelf")
 }
 
-var next = document.getElementById("next_btn");
-next.addEventListener("click", function(e){
-  window.scrollTo(0,0);
-  let spineitem = currentSection.next();
-  console.log(spineitem)
-  display(spineitem.href, 0)
-  e.preventDefault();
-}, false);
+onMounted(()=>{
+  var next = document.getElementById("next_btn");
+  next.addEventListener("click", function(e){
+    window.scrollTo(0,0);
+    let spineitem = currentSection.next();
+    console.log(spineitem)
+    display(spineitem.href, 0)
+    e.preventDefault();
+  }, false);
+})
+
 
 window.addEventListener("scrollend", function(){
   console.log(window.scrollY)
@@ -142,10 +156,10 @@ window.addEventListener("scrollend", function(){
   let readingPos = window.scrollY/document.body.scrollHeight
 
   let data = new FormData()
-  data.append("opf", store.opfPath)
+  data.append("id", bookid)
   data.append("link", currentSectionLink)
   data.append("percentage", String(readingPos))
-  this.fetch("/api/setreadingpos", {
+  this.fetch("/api/readingposset", {
     method:"POST",
     body: data
   })
