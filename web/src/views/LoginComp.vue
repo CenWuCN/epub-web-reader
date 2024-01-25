@@ -37,22 +37,27 @@ function Login(){
     <div class="login_view">
         <div class="login_input">
             <div class="input_box">
-                <el-text class="text">账号</el-text>
-                <el-input v-model="id" class="input" placeholder="Please input" />
+                <el-text class="text" size="large">账号</el-text>
+                <el-input v-model="id" class="input" placeholder="Please input" size="large"/>
             </div>
             <div class="input_box">
-                <el-text class="text">密码</el-text>
+                <el-text class="text" size="large">密码</el-text>
                 <el-input v-model="pw" class="input"
                     type="password"
                     placeholder="Please input password"
                     show-password
+                    size="large"
                 />
             </div>
         </div>
 
         <div class="login_btns">
-            <el-button class="btn" @click="Login()">登陆</el-button>
-            <el-button class="btn">注册</el-button>
+            <el-button class="btn" size="large" type="primary" @click="Login()">登陆</el-button>
+            <div class="create_link">
+                <el-text>如果你还没有账号</el-text>
+                <el-link type="primary">创建一个</el-link>
+            </div>
+
         </div>
     </div>
 </template>
@@ -75,33 +80,21 @@ function Login(){
 }
 .input_box {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    /* align-items: flex-start; */
     margin-top: 20px;
     width: 360px;
 }
-.input.el-input {
-    height: 50px;
-}
-.text {
-    font-size: 22px;
-    white-space: nowrap;
-    width: 100px;
-}
-.input .el-input__wrapper {
-    background-color: #1c1c1d;
-}
 .login_btns {
-    display: flex;
-    align-items: center;
-    align-content: center;
-    flex-direction: column;
+    margin-top: 50px;
 }
-.btn.el-button {
-    margin-top: 40px;
-    width: 280px;
-    height: 50px;
-    margin-left: 0px;
-    background-color: #1c1c1d;
-    font-size: 22px;
+.input_box .el-text {
+    align-self: flex-start;
+    margin-bottom: 10px;
 }
+.el-button {
+    width: 360px;
+    margin-bottom: 20px;
+}
+
 </style>
