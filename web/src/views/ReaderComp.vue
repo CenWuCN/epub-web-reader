@@ -6,7 +6,7 @@ import { onMounted, ref } from 'vue'
 import router from "../router"
 import {useStore} from '../stores/store'
 import BookInfo from '../datastruct/BookInfo'
-import { useRoute } from 'vue-router'
+import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
 const store = useStore()
 
@@ -106,7 +106,8 @@ function display(link: string, readingPos:number){
         area.style.color = "#d0d3d8"
         area.style.backgroundColor = "#1c1c1d"
         area.style.fontSize = "18px"
-        area.style.lineHeight="4em"
+        // area.style.lineHeight="4em"
+        // area.style.lineHeight="important"
         
         if (readingPos == 0){
           if (tocInHtmlId !== null){
@@ -137,19 +138,7 @@ function JumpToBookShelf(){
   router.push("/bookshelf")
 }
 
-onMounted(()=>{
-  var next = document.getElementById("next_btn");
-  next.addEventListener("click", function(e){
-    window.scrollTo(0,0);
-    let spineitem = currentSection.next();
-    console.log(spineitem)
-    display(spineitem.href, 0)
-    e.preventDefault();
-  }, false);
-})
-
-
-window.addEventListener("scrollend", function(){
+function ScrollendEnvent(){
   console.log(window.scrollY)
   console.log(document.body.scrollHeight)
   console.log("保存数值", currentSectionLink, document.body.scrollHeight, window.scrollY, window.scrollY/document.body.scrollHeight)
@@ -164,16 +153,35 @@ window.addEventListener("scrollend", function(){
     method:"POST",
     body: data
   })
-})
+}
 
-window.addEventListener("resize", function(){
+function ResizeEvent(){
   if (window.innerWidth < 768){
     drawerwidth.value = "80%"
   }
   else{
     drawerwidth.value = "30%"
   }
+}
+
+onMounted(()=>{
+  var next = document.getElementById("next_btn");
+  next.addEventListener("click", function(e){
+    window.scrollTo(0,0);
+    let spineitem = currentSection.next();
+    console.log(spineitem)
+    display(spineitem.href, 0)
+    e.preventDefault();
+  }, false);
 })
+onBeforeRouteLeave(()=>{
+  window.removeEventListener("scrollend", ScrollendEnvent)
+  window.removeEventListener("resize", ResizeEvent)
+})
+
+window.addEventListener("scrollend", ScrollendEnvent)
+
+window.addEventListener("resize", ResizeEvent)
 
 </script>
 
@@ -239,7 +247,7 @@ window.addEventListener("resize", function(){
   width: 798px;
   height: auto;
   color:"#d0d3d8";
-  background-color:"#1c1c1d",
+  background-color:"#1c1c1d";
 }
 .p{
   color: #d0d3d8;
