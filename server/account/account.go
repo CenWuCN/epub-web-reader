@@ -205,7 +205,7 @@ func (u *User) UnzipAndGenerateEpubWebInfo(epubAbsPath string) (*Book, error) {
 			fmt.Println("copy failed", err)
 		}
 
-		if filepath.Base(file.Name) == coverRelPath {
+		if filepath.Base(file.Name) == filepath.Base(coverRelPath) {
 			book.CoverPath = filepath.Join(setting.ConfigYaml.GinEpubsStaticPath, bookFolderName, file.Name)
 		}
 
