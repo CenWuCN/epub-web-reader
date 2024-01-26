@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { ElMessageBox } from 'element-plus'
 import 'element-plus/theme-chalk/index.css';
 import router from '../router'
+import errorcode from '../errorcode'
 
 const id = ref("")
 const pw = ref("")
@@ -18,10 +19,10 @@ function Login(){
         .then(response=> response.json())
         .then(data=>{
             console.log(data)
-            if (data.message == ""){
+            if (data.errorcode == ""){
                 router.push("/bookshelf")
             }else{
-                ElMessageBox.confirm('Are you sure to close this dialog?')
+                ElMessageBox.confirm(errorcode[data.errorcode])
                     .then(() => {
                     })
                     .catch(() => {
@@ -55,7 +56,7 @@ function Login(){
             <el-button class="btn" size="large" type="primary" @click="Login()">登陆</el-button>
             <div class="create_link">
                 <el-text>如果你还没有账号</el-text>
-                <el-link type="primary">创建一个</el-link>
+                <el-link type="primary" href="/register">创建一个</el-link>
             </div>
 
         </div>
@@ -63,38 +64,5 @@ function Login(){
 </template>
 
 <style scroped>
-.login_view {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    background-color: #1c1c1d;
-    height: 100vh;
-}
-.login_input {
-    display: flex;
-    align-items: center;
-    align-content: center;
-    flex-direction: column;
-    width: 350px;
-}
-.input_box {
-    display: flex;
-    flex-direction: column;
-    /* align-items: flex-start; */
-    margin-top: 20px;
-    width: 360px;
-}
-.login_btns {
-    margin-top: 50px;
-}
-.input_box .el-text {
-    align-self: flex-start;
-    margin-bottom: 10px;
-}
-.el-button {
-    width: 360px;
-    margin-bottom: 20px;
-}
-
+@import "../css/uikit.css"
 </style>
