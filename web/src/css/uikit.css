@@ -1,0 +1,32 @@
+.login_view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #1c1c1d;
+    height: 100vh;
+}
+.login_input {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    flex-direction: column;
+    width: 350px;
+}
+.input_box {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    width: 360px;
+}
+.login_btns {
+    margin-top: 50px;
+}
+.input_box .el-text {
+    align-self: flex-start;
+    margin-bottom: 10px;
+}
+.el-button {
+    width: 360px;
+    margin-bottom: 20px;
+}
