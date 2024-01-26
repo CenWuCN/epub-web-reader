@@ -55,6 +55,16 @@ func CreateUser(id string, name string, pw string) {
 	u.Save()
 }
 
+func IsUserExist(id string) bool {
+	accFilePath := filepath.Join(AccFolder, id+YamlExt)
+	_, err := os.ReadFile(accFilePath)
+	if err != nil {
+		return true
+	} else {
+		return false
+	}
+}
+
 func GetUserById(id string) (*User, error) {
 	user := User{}
 	accFilePath := filepath.Join(AccFolder, id+YamlExt)
@@ -67,7 +77,7 @@ func GetUserById(id string) (*User, error) {
 	}
 
 	yaml.Unmarshal(bytes, &user)
-	return &user, err
+	return &user, nil
 }
 
 func (u *User) AddBook(bookAbsName string) {
@@ -126,6 +136,7 @@ func (u *User) UnzipAndGenerateEpubWebInfo(epubAbsPath string) (*Book, error) {
 	if err != nil {
 		return &book, err
 	}
+	defer e.Close()
 	opf, err := e.Package()
 	if err != nil {
 		return &book, err
@@ -194,15 +205,19 @@ func (u *User) UnzipAndGenerateEpubWebInfo(epubAbsPath string) (*Book, error) {
 		}
 		defer fileReader.Close()
 
-		destFile, err := os.Create(fileAbsPath)
-		if err != nil {
-			fmt.Println("create file err", err)
-		}
-		defer destFile.Close()
+		_, err = os.Stat(fileAbsPath)
+		if os.IsNotExist(err) {
+			destFile, err := os.Create(fileAbsPath)
+			if err != nil {
+				fmt.Println("create file err", err)
+			}
+			defer destFile.Close()
 
-		_, err = io.Copy(destFile, fileReader)
-		if err != nil {
-			fmt.Println("copy failed", err)
+			_, err = io.Copy(destFile, fileReader)
+			if err != nil {
+				fmt.Println("copy failed", err)
+			}
+
 		}
 
 		if filepath.Base(file.Name) == filepath.Base(coverRelPath) {

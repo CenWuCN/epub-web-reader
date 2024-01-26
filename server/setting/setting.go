@@ -10,9 +10,10 @@ import (
 )
 
 type Config struct {
-	EpubsPath          string `yaml:"epubsPath"`
-	UnzipPath          string `yaml:"unzipPath"`
-	GinEpubsStaticPath string `yaml:"ginEpubsStaticPath"`
+	EpubsPath          string   `yaml:"epubsPath"`
+	UnzipPath          string   `yaml:"unzipPath"`
+	GinEpubsStaticPath string   `yaml:"ginEpubsStaticPath"`
+	Invitecodes        []string `yaml:"invitecode"`
 }
 
 var EpubsAbsPath string = ""
