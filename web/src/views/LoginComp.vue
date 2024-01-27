@@ -16,20 +16,21 @@ function Login(){
         method:"POST",
         body: formData
     })
-        .then(response=> response.json())
-        .then(data=>{
-            console.log(data)
-            if (data.errorcode == ""){
-                router.push("/bookshelf")
-            }else{
-                ElMessageBox.confirm(errorcode[data.errorcode])
-                    .then(() => {
-                    })
-                    .catch(() => {
+    .then(response=> response.json())
+    .then(data=>{
+        console.log(data)
+        if (data.errorcode == 0){
+            router.push("/bookshelf")
+            localStorage.setItem("token", data.token)
+        }else{
+            ElMessageBox.alert(errorcode[data.errorcode])
+                .then(() => {
+                })
+                .catch(() => {
 
-                    })
-            }
-        })
+                })
+        }
+    })
 }
 
 </script>

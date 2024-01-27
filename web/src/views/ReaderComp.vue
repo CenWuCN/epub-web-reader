@@ -139,19 +139,18 @@ function JumpToBookShelf(){
 }
 
 function ScrollendEnvent(){
-  console.log(window.scrollY)
-  console.log(document.body.scrollHeight)
-  console.log("保存数值", currentSectionLink, document.body.scrollHeight, window.scrollY, window.scrollY/document.body.scrollHeight)
-
   let readingPos = window.scrollY/document.body.scrollHeight
 
   let data = new FormData()
   data.append("id", bookid)
   data.append("link", currentSectionLink)
   data.append("percentage", String(readingPos))
-  this.fetch("/api/readingposset", {
+  fetch("/api/readingposset", {
     method:"POST",
-    body: data
+    body: data,
+    headers:{
+      "Authorization": "Bearer " + store.getToken()
+    }
   })
 }
 

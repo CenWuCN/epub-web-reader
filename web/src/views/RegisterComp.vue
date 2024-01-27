@@ -19,8 +19,13 @@ function Register(){
         method:"POST",
         body:data
     })
-    .then(response=>response.json())
+    .then(response=>{
+        let data = response.json()
+        console.log(data)
+        return data
+    })
     .then(data=>{
+        console.log(data)
         if(data.errorcode == 0){
             router.push("/login")
         }else{
