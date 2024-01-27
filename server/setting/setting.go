@@ -1,6 +1,8 @@
 package setting
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"os/user"
@@ -13,11 +15,13 @@ type Config struct {
 	EpubsPath          string   `yaml:"epubsPath"`
 	UnzipPath          string   `yaml:"unzipPath"`
 	GinEpubsStaticPath string   `yaml:"ginEpubsStaticPath"`
+	Jwtkey             string   `yaml:"jwtkey"`
 	Invitecodes        []string `yaml:"invitecode"`
 }
 
 var EpubsAbsPath string = ""
 var UnzipAbsPath string = ""
+var JwtkeyBytes []byte
 var ConfigYaml = Config{}
 
 func Init() {
@@ -35,6 +39,21 @@ func Init() {
 	if err != nil {
 		fmt.Println("ExpandTilde Err", ConfigYaml.UnzipPath, err)
 	}
+	if ConfigYaml.Jwtkey == "" {
+		bytes = make([]byte, 32)
+		_, err = rand.Read(bytes)
+		if err != nil {
+			fmt.Println(err)
+		}
+		jwtkey := base64.StdEncoding.EncodeToString(bytes)
+		ConfigYaml.Jwtkey = jwtkey
+		bytes, err = yaml.Marshal(&ConfigYaml)
+		if err != nil {
+			fmt.Println(err)
+		}
+		os.WriteFile("./config.yaml", bytes, os.ModePerm)
+	}
+	JwtkeyBytes = []byte(ConfigYaml.Jwtkey)
 }
 
 func ExpandTilde(path string) (string, error) {

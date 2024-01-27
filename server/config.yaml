@@ -1,6 +1,5 @@
-epubsPath: "~/Documents/epubs/"
-unzipPath: "~/Documents/epubs/books/"
-ginEpubsStaticPath: "/epubs"
-invitecodes:
-  -1111
-  -2222
+epubsPath: ~/Documents/epubs/
+unzipPath: ~/Documents/epubs/books/
+ginEpubsStaticPath: /epubs
+jwtkey: cmVT/tNqU+zXX5MPGgE4bnkVAy5YtA3WKjpZHIsZfXc=
+invitecode: [1111]

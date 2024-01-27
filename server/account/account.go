@@ -58,11 +58,7 @@ func CreateUser(id string, name string, pw string) {
 func IsUserExist(id string) bool {
 	accFilePath := filepath.Join(AccFolder, id+YamlExt)
 	_, err := os.ReadFile(accFilePath)
-	if err != nil {
-		return true
-	} else {
-		return false
-	}
+	return err == nil
 }
 
 func GetUserById(id string) (*User, error) {
