@@ -8,6 +8,9 @@ export const useStore = defineStore("store", {
                 this.token = localStorage.getItem("token")
             }
             return this.token
+        },
+        getHeaders(){
+            return {"Authorization": "Bearer " + this.getToken() }
         }
     }
 })

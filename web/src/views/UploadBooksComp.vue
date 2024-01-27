@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { UploadFilled } from '@element-plus/icons-vue'
 import HeaderComp from '../components/HeaderComp.vue';
+import { ref } from 'vue';
+import {useStore} from '../stores/store'
+
+const store = useStore()
+
+const headers= ref({})
+headers.value = store.getHeaders()
+
 </script>
 
 <template>
@@ -10,6 +18,7 @@ import HeaderComp from '../components/HeaderComp.vue';
             class="upload-demo"
             drag
             action="/api/uploadbooks"
+            :headers="headers"
             multiple
             accept=".epub"
             >

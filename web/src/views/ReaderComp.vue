@@ -36,9 +36,15 @@ let area = document.getElementById("area")
 
 fetch("/api/bookinfo", {
   method:"POST",
-  body:data
+  body:data,
+  headers: store.getHeaders()
 })
-.then(response=>response.json())
+.then(response=>{
+        if (response.status == 401) {
+            router.push("/login")
+        }
+        return response.json()
+    })
 .then((bookinfo)=>{
   console.log(bookinfo)
   bookinfo as BookInfo
@@ -148,9 +154,7 @@ function ScrollendEnvent(){
   fetch("/api/readingposset", {
     method:"POST",
     body: data,
-    headers:{
-      "Authorization": "Bearer " + store.getToken()
-    }
+    headers: store.getHeaders()
   })
 }
 

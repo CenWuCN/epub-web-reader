@@ -4,9 +4,9 @@
 
 <template>
     <div class="header">
-        <el-button size = "large">上传书籍</el-button>
-        <el-button size = "large">管理书籍</el-button>
-        <el-button size = "large">书架</el-button>
+        <RouterLink to="/uploadbooks"><el-button size = "large">上传书籍</el-button></RouterLink>
+        <RouterLink to="/managebooks"><el-button size = "large">管理书籍</el-button></RouterLink> 
+        <RouterLink to="/bookshelf"><el-button size = "large">书架</el-button></RouterLink>
         <el-text size="large">example</el-text>
     </div>
 </template>

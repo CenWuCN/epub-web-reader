@@ -4,14 +4,22 @@ import BookInfoComp from '../components/BookInfoComp.vue';
 import { ref } from 'vue';
 import {useStore} from '../stores/store'
 import BookInfo from '../datastruct/BookInfo'
+import HeaderComp from '../components/HeaderComp.vue';
 
 const store = useStore()
 
 const bookinfos = ref<Array<BookInfo>>([])
-fetch("/api/bookshelf")
-    .then(response => response.json())
+fetch("/api/bookshelf", {
+        method:"POST",
+        headers: store.getHeaders()
+    })
+    .then(response => {
+        if (response.status == 401) {
+            router.push("/login")
+        }
+        return response.json()
+    })
     .then(booktable => {
-        console.log(booktable)
         bookinfos.value = booktable
         })
 
@@ -25,6 +33,7 @@ function JumptoReader(bookid: string){
 <template>
     <div id = "container">
         <div id="app_content">
+            <HeaderComp></HeaderComp>
             <div id="BookShelf">
                 <BookInfoComp @click="JumptoReader(bookinfo.Id)" v-for="bookinfo in bookinfos" 
                     :bookName="bookinfo.Name"

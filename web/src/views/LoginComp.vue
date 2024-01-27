@@ -20,8 +20,8 @@ function Login(){
     .then(data=>{
         console.log(data)
         if (data.errorcode == 0){
-            router.push("/bookshelf")
             localStorage.setItem("token", data.token)
+            router.push("/bookshelf")
         }else{
             ElMessageBox.alert(errorcode[data.errorcode])
                 .then(() => {
