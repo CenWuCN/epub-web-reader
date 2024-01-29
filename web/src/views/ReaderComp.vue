@@ -66,7 +66,7 @@ fetch("/api/bookinfo", {
 })
 
   book.loaded.metadata.then((metadata)=>{
-    booktitle.value = metadata.title
+    booktitle.value = metadata.title.substring(0, 30) + "..."
   })
 })
 
