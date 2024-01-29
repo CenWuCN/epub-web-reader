@@ -85,7 +85,7 @@ func main() {
 		token := jwt.New(jwt.SigningMethodHS256)
 		claims := token.Claims.(jwt.MapClaims)
 		claims["id"] = id
-		claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+		claims["exp"] = time.Now().Add(time.Hour * 6).Unix()
 
 		tokenString, err := token.SignedString([]byte(setting.ConfigYaml.Jwtkey))
 		if err != nil {
