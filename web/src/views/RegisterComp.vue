@@ -73,5 +73,5 @@ function Register(){
 </template>
 
 <style scoped>
-@import "../css/uikit.css"
+@import "../css/login-center-bg.css"
 </style>

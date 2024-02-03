@@ -7,7 +7,7 @@
   color-scheme: light dark;
   /* color: rgba(255, 255, 255, 0.87);
   background-color: #242424; */
-  color: black;
+  color: #d0d3d8;
   background-color: white;
 
   font-synthesis: none;
@@ -28,7 +28,7 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  /* place-items: center; */
   min-width: 100%;
   min-height: 100vh;
   background-color: #1c1c1d;

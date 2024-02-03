@@ -12,7 +12,7 @@ headers.value = store.getHeaders()
 </script>
 
 <template>
-    <div class="bg">
+    <div class="middle-bg">
         <HeaderComp></HeaderComp>
         <el-upload
             class="upload-demo"
@@ -37,18 +37,7 @@ headers.value = store.getHeaders()
 </template>
 
 <style scoped>
-.bg {
-    display: flex;
-    flex-direction: column;
-    width: 1000px;
-    height: 100vh;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.upload-demo {
-    margin-top: 400px;
-}
+@import "../css/middle-bg.css";
 
 @media screen and (width < 768px) {
     .bg {

@@ -65,5 +65,5 @@ function Login(){
 </template>
 
 <style scroped>
-@import "../css/uikit.css"
+@import "../css/login-center-bg.css"
 </style>

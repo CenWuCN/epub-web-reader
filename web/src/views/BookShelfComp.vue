@@ -55,7 +55,7 @@ function JumptoReader(bookid: string){
 }
 #app_content {
     max-width: 1120px;
-    padding-top: 72px;
+    /* padding-top: 72px; */
     margin-left: auto;
     margin-right: auto;
     background-color: #1c1c1d;
